@@ -5,6 +5,8 @@
 
 ![redbird](http://cliparts.co/cliparts/6cr/o9d/6cro9dRzi.jpg)
 
+**This is modified version from manast and it support `ws` and `wss` protocol**
+
 It should be easy and robust to handle dynamic virtual hosts, load balancing, proxying web sockets and SSL encryption.
 
 With Redbird you get a complete library to build dynamic reverse proxies with the speed and robustness of http-proxy.
@@ -105,7 +107,7 @@ redbird.register('example.com', 'http://172.60.80.2:8082', {
 // HTTP2 Support using LetsEncrypt for the certificates
 //
 var proxy = require('redbird')({
-  port: 80, // http port is needed for LetsEncrypt challenge during request / renewal. Also enables automatic http->https redirection for registered https routes. 
+  port: 80, // http port is needed for LetsEncrypt challenge during request / renewal. Also enables automatic http->https redirection for registered https routes.
   letsencrypt: {
     path: __dirname + '/certs',
     port: 9999 // LetsEncrypt minimal web server port for handling challenges. Routed 80->9999, no need to open 9999 in firewall. Default 3000 if not defined.
@@ -402,23 +404,23 @@ setTimeout(function() {
 
 ## Replacing the default HTTP/HTTPS server modules
 
-By passing `serverModule: module` or `ssl: {serverModule : module}` you can override the default http/https 
+By passing `serverModule: module` or `ssl: {serverModule : module}` you can override the default http/https
 servers used to listen for connections with another module.
 
-One application for this is to enable support for PROXY protocol: This is useful if you want to use a module like 
-[findhit-proxywrap](https://github.com/findhit/proxywrap) to enable support for the 
+One application for this is to enable support for PROXY protocol: This is useful if you want to use a module like
+[findhit-proxywrap](https://github.com/findhit/proxywrap) to enable support for the
 [PROXY protocol](http://www.haproxy.org/download/1.8/doc/proxy-protocol.txt).
- 
-                                                                  
-PROXY protocol is used in tools like HA-Proxy, and can be optionally enabled in Amazon ELB load balancers to pass the 
-original client IP when proxying TCP connections (similar to an X-Forwarded-For header, but for raw TCP). This is useful 
-if you want to run redbird on AWS behind an ELB load balancer, but have redbird terminate any HTTPS connections so you 
-can have SNI/Let's Encrypt/HTTP2support. With this in place Redbird will see the client's IP address rather 
+
+
+PROXY protocol is used in tools like HA-Proxy, and can be optionally enabled in Amazon ELB load balancers to pass the
+original client IP when proxying TCP connections (similar to an X-Forwarded-For header, but for raw TCP). This is useful
+if you want to run redbird on AWS behind an ELB load balancer, but have redbird terminate any HTTPS connections so you
+can have SNI/Let's Encrypt/HTTP2support. With this in place Redbird will see the client's IP address rather
 than the load-balancer's, and pass this through in an X-Forwarded-For header.
 
 ````javascript
 //Options for proxywrap. This means the proxy will also respond to regular HTTP requests without PROXY information as well.
-proxy_opts = {strict: false}; 
+proxy_opts = {strict: false};
 proxyWrap = require('findhit-proxywrap');
 var opts = {
     port: process.env.HTTP_PORT,
@@ -428,7 +430,7 @@ var opts = {
         http2: true,        
         serverModule: proxyWrap.proxy(require('spdy').server, proxy_opts),
         //Do this if you only want regular https
-        // serverModule: proxyWrap.proxy( require('http'), proxy_opts), 
+        // serverModule: proxyWrap.proxy( require('http'), proxy_opts),
         port: process.env.HTTPS_PORT,
     }
 }
@@ -481,7 +483,7 @@ __Arguments__
         If you want to disable bunyan, just set this option to false. Keep in mind that
         having logs enabled incours in a performance penalty of about one order of magnitude per request.
         resolvers: {Function | Array}  a list of custom resolvers. Can be a single function or an array of functions. See more details about resolvers above.
-        serverModule : {Module} Optional - Override the http server module used to listen for http connections.  Default is require('http') 
+        serverModule : {Module} Optional - Override the http server module used to listen for http connections.  Default is require('http')
 	}
 ```
 
